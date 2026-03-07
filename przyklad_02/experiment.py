@@ -1,0 +1,84 @@
+import os
+import tempfile
+
+import matplotlib.pyplot as plt
+import mlflow
+import mlflow.sklearn
+import pandas as pd
+from mlflow.models import infer_signature
+from sklearn.datasets import fetch_openml
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import (
+    accuracy_score,
+    confusion_matrix,
+    ConfusionMatrixDisplay,
+    f1_score,
+    precision_score,
+    recall_score,
+)
+from sklearn.model_selection import train_test_split
+
+
+def load_and_preprocess_data():
+    """Pobiera zbiór Titanic z OpenML i wykonuje preprocessing."""
+
+    # Pobranie danych z OpenML (id=40945 — Titanic)
+    data = fetch_openml(data_id=40945, as_frame=True)
+    df = data.frame
+
+    # Usunięcie kolumn, które nie wnoszą wartości predykcyjnej
+    df = df.drop(columns=["name", "ticket", "cabin", "body", "boat", "home.dest"])
+
+    # Uzupełnienie braków wartością mediany / dominanty
+    df["age"] = df["age"].fillna(df["age"].median())
+    df["fare"] = df["fare"].fillna(df["fare"].median())
+    df["embarked"] = df["embarked"].fillna(df["embarked"].mode()[0])
+
+    # Zamiana zmiennych kategorycznych na numeryczne
+    df["sex"] = df["sex"].map({"male": 0, "female": 1}).astype(int)
+    df = pd.get_dummies(df, columns=["embarked"], drop_first=True)
+
+    # Podział na cechy (X) i zmienną docelową (y)
+    X = df.drop(columns=["survived"])
+    y = df["survived"].astype(int)
+
+    return X, y
+
+def main():
+    X, y = load_and_preprocess_data()
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
+
+    mlflow.set_experiment("titanic-classification")
+
+    with mlflow.start_run(run_name="random-forest"):
+        params = {
+            "n_estimators": 100,
+            "max_depth": 5,
+            "random_state": 42,
+        }
+        mlflow.log_params(params)
+        model = RandomForestClassifier(**params)
+
+        model.fit(X_train, y_train)
+
+        y_pred = model.predict(X_test)
+
+        metrics = {
+            "accuracy": accuracy_score(y_test, y_pred),
+            "f1": f1_score(y_test, y_pred),
+            "precision": precision_score(y_test, y_pred),
+            "recall": recall_score(y_test, y_pred),
+        }
+
+        mlflow.log_metrics(metrics)
+
+        print(metrics)
+
+        signature = infer_signature(X_test, y_pred)
+        mlflow.sklearn.log_model(model, "model", signature=signature)
+
+if __name__ == "__main__":
+    main()
