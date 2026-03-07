@@ -1,6 +1,6 @@
 import os
 import tempfile
-
+import shutil
 import matplotlib.pyplot as plt
 import mlflow
 import mlflow.sklearn
@@ -77,8 +77,23 @@ def main():
 
         print(metrics)
 
+        tmpdir = tempfile.mkdtemp()
+        try:
+            cm = confusion_matrix(y_test, y_pred)
+            disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["Nie przeżył", "Przeżył"])
+            fig_cm, ax_cm = plt.subplots(figsize=(6, 5))
+            disp.plot(ax=ax_cm, cmap="Blues")
+            ax_cm.set_title("Macierz pomyłek — Random Forest")
+            cm_path = os.path.join(tmpdir, "confusion_matrix.png")
+            fig_cm.savefig(cm_path, bbox_inches="tight", dpi=150)
+            plt.close(fig_cm)
+            mlflow.log_artifact(cm_path, artifact_path="plots")
+        finally:
+            shutil.rmtree(tmpdir)
+
+        mlflow.log_artifact(__file__, artifact_path="code")
+
         signature = infer_signature(X_test, y_pred)
         mlflow.sklearn.log_model(model, "model", signature=signature)
-
 if __name__ == "__main__":
     main()
