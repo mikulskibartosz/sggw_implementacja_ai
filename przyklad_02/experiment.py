@@ -4,6 +4,7 @@ import shutil
 import matplotlib.pyplot as plt
 import mlflow
 import mlflow.sklearn
+import mlflow.data
 import pandas as pd
 from mlflow.models import infer_signature
 from sklearn.datasets import fetch_openml
@@ -51,9 +52,18 @@ def main():
         X, y, test_size=0.2, random_state=42
     )
 
+    train_data = pd.concat([X_train, y_train], axis=1)
+    test_data = pd.concat([X_test, y_test], axis=1)
+
+    train_dataset = mlflow.data.from_pandas(train_data, name="titanic-train", targets="survived")
+    test_dataset = mlflow.data.from_pandas(test_data, name="titanic-test", targets="survived")
+
     mlflow.set_experiment("titanic-classification")
 
     with mlflow.start_run(run_name="random-forest"):
+        mlflow.log_input(train_dataset, context="train")
+        mlflow.log_input(test_dataset, context="test")
+
         params = {
             "n_estimators": 100,
             "max_depth": 5,
