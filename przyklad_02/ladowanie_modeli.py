@@ -23,3 +23,14 @@ print(model)
 
 prediction = model.predict(example_input)
 print("Prediction for example input (z rejestru):", prediction)
+
+# Z Model Registry z użyciem aliasu
+model_name = "Titanic"
+model = mlflow.sklearn.load_model(
+    f"models:/{model_name}@production"
+)
+
+print(model)
+
+prediction = model.predict(example_input)
+print("Prediction for example input (z rejestru z aliasem):", prediction)
