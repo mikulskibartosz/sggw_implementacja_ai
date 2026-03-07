@@ -12,9 +12,14 @@ example_input = np.array([[2, 1, 28.0, 0, 0, 13.0, False, True]])
 prediction = loaded_model.predict(example_input)
 print("Prediction for example input:", prediction)
 
-# # Z Model Registry
-# model_name = "TitanicSurvivalModel"
-# version = 2
-# model = mlflow.sklearn.load_model(
-#     f"models:/{model_name}/{version}"
-# )
+# Z Model Registry
+model_name = "Titanic"
+version = 1
+model = mlflow.sklearn.load_model(
+    f"models:/{model_name}/{version}"
+)
+
+print(model)
+
+prediction = model.predict(example_input)
+print("Prediction for example input (z rejestru):", prediction)
