@@ -50,3 +50,5 @@ python.exe -m pip install -r requirements.txt
 8. git checkout [nazwa brancha]
 9. Usuwamy pliki śledzone przez dvc z katalogu data oraz .dvc/cache
 10. dvc pull
+
+https://mikulskibartosz.github.io/sggw_implementacja_ai/#/3/10
