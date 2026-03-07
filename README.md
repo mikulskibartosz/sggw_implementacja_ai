@@ -37,3 +37,16 @@ python.exe -m pip install -r requirements.txt
 | `dvc checkout` | Przywraca dane z zdalnego repozytorium |
 | `dvc du . ` | Pokazuje rozmiar danych w projekcie |
 | `dvc gc --workspace` | Usuwa niepotrzebne dane z cache |
+
+## DVC Workflow
+
+1. Tworzymy plik w katalogu data (nowy!)
+2. Dodajemy do dvc: `dvc add nazwa_pliku`
+3. dvc push, git add, git commit
+4. Zmiana zawartości pliku (tego nowego)
+5. dvc add, dvc push, git add, git commit
+6. git checkout [nazwa brancha lub id commitu] (na poprzedni stan pliku)
+7. dvc checkout
+8. git checkout [nazwa brancha]
+9. Usuwamy pliki śledzone przez dvc z katalogu data oraz .dvc/cache
+10. dvc pull
