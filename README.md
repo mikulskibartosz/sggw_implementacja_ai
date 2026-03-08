@@ -37,6 +37,12 @@ python.exe -m pip install -r requirements.txt
 | `dvc checkout` | Przywraca dane z zdalnego repozytorium |
 | `dvc du . ` | Pokazuje rozmiar danych w projekcie |
 | `dvc gc --workspace` | Usuwa niepotrzebne dane z cache |
+| `dvc repro` | Uruchamia ponownie pipeline |
+| `dvc dag` | Pokazuje graf zależności |
+| `dvc metrics show` | Pokazuje metryki |
+| `dvc metrics diff` | Porównuje metryki |
+| `dvc exp run --set-param n_estimators=200` | Uruchamia eksperyment z modyfikacją parametrów |
+| `dvc exp show` | Pokazuje eksperymenty |
 
 ## DVC Workflow
 
