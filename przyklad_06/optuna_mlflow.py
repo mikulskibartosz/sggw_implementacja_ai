@@ -9,6 +9,12 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.model_selection import cross_val_score, train_test_split, KFold
 
+import matplotlib.pyplot as plt
+import optuna.visualization as vis
+import seaborn as sns
+import os
+
+
 
 def load_and_preprocess_data():
     """Pobiera Titanic z OpenML i wykonuje preprocessing."""
@@ -67,7 +73,7 @@ def main():
         metric_name="cv_accuracy",
     )
     study = optuna.create_study(direction="maximize", study_name="titanic-optuna", pruner=optuna.pruners.MedianPruner(n_warmup_steps=2))
-    study.optimize(objective, n_trials=30, callbacks=[mlflow_callback])
+    study.optimize(objective, n_trials=10, callbacks=[mlflow_callback])
 
     print(f"Best parameters: {study.best_params}")
 
@@ -87,6 +93,24 @@ def main():
 
         signature = infer_signature(X_train, best_model.predict(X_train))
         mlflow.sklearn.log_model(best_model, "model", signature=signature)
+
+        # wizualizacje
+        artifact_dir = "optuna_plots"
+        os.makedirs(artifact_dir, exist_ok=True)
+
+        fig = vis.plot_optimization_history(study)
+        fig.write_image(f"{artifact_dir}/optimization_history.png")
+
+        fig = vis.plot_contour(study)
+        fig.write_image(f"{artifact_dir}/contour.png")
+
+        fig = vis.plot_parallel_coordinate(study)
+        fig.write_image(f"{artifact_dir}/parallel_coordinate.png")
+
+        fig = vis.plot_slice(study)
+        fig.write_image(f"{artifact_dir}/slice.png")
+
+        mlflow.log_artifacts(artifact_dir)
 
     print(f"Test accuracy: {test_accuracy}")
     print(f"Test F1 score: {test_f1}")
