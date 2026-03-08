@@ -3,3 +3,4 @@
 *.db
 **/mlruns
 dvc_remote/*
+**/metrics.json

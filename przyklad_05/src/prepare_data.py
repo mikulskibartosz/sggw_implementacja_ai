@@ -56,7 +56,6 @@ def main():
         f"{len(test_df)} testowych (test_size={test_size})."
     )
 
-    # Zapis zbiorow do plikow CSV
     train_df.to_csv("data/train.csv", index=False)
     test_df.to_csv("data/test.csv", index=False)
     print("Zapisano data/train.csv i data/test.csv.")
