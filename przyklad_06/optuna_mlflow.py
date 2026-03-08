@@ -48,17 +48,32 @@ def main():
         scores = cross_val_score(model, X_train, y_train, cv=5, scoring="accuracy")
         return scores.mean()
 
+    mlflow.set_experiment("titanic-optuna")
+    mlflow_callback = MLflowCallback(
+        tracking_uri=mlflow.get_tracking_uri(),
+        metric_name="cv_accuracy",
+    )
     study = optuna.create_study(direction="maximize")
-    study.optimize(objective, n_trials=100)
+    study.optimize(objective, n_trials=10, callbacks=[mlflow_callback])
 
     print(f"Best parameters: {study.best_params}")
 
     best_model = RandomForestClassifier(**study.best_params, random_state=42)
-    best_model.fit(X_train, y_train)
 
-    y_pred = best_model.predict(X_test)
-    test_accuracy = accuracy_score(y_test, y_pred)
-    test_f1 = f1_score(y_test, y_pred)
+    with mlflow.start_run(run_name="best-model"):
+        mlflow.log_params(study.best_params)
+
+        best_model.fit(X_train, y_train)
+
+        y_pred = best_model.predict(X_test)
+        test_accuracy = accuracy_score(y_test, y_pred)
+        test_f1 = f1_score(y_test, y_pred)
+
+        mlflow.log_metric("test_accuracy", test_accuracy)
+        mlflow.log_metric("test_f1_score", test_f1)
+
+        signature = infer_signature(X_train, best_model.predict(X_train))
+        mlflow.sklearn.log_model(best_model, "model", signature=signature)
 
     print(f"Test accuracy: {test_accuracy}")
     print(f"Test F1 score: {test_f1}")
