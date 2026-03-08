@@ -28,3 +28,12 @@ class TitanicClassifierService:
 
         pred = self.model.predict(params)
         return {"prediction": int(pred[0])}
+
+    @bentoml.api()
+    def predict_batch(self, features_batch: pd.DataFrame):
+        predictions = self.model.predict(features_batch)
+
+        results = []
+        for pred in predictions:
+            results.append({"prediction": int(pred[0])})
+        return results
