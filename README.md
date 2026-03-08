@@ -44,6 +44,15 @@ python.exe -m pip install -r requirements.txt
 | `dvc exp run --set-param n_estimators=200` | Uruchamia eksperyment z modyfikacją parametrów |
 | `dvc exp show` | Pokazuje eksperymenty |
 
+## BentoML
+
+| Komenda | Opis |
+|---------|------|
+| `bentoml models list` | Pokazuje modele |
+| `bentoml serve service:NazwaSerwisu` | Uruchamia serwis |
+| `bentoml build` | Buduje serwis |
+| `bentoml containerize` | Buduje kontener |
+
 ## DVC Workflow
 
 1. Tworzymy plik w katalogu data (nowy!)
