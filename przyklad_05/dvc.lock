@@ -57,7 +57,7 @@ stages:
     params:
       params.yaml:
         model.max_depth: 5
-        model.n_estimators: 100
+        model.n_estimators: 200
         model.random_state: 42
     outs:
     - path: metrics.json
@@ -66,5 +66,5 @@ stages:
       size: 46
     - path: models/model.pkl
       hash: md5
-      md5: c3f86c7051366871ed9e05d48b80298e
-      size: 430136
+      md5: 3e0377aba5e7b5f511e3ad280b1f0c20
+      size: 858770
